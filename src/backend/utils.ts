@@ -1,17 +1,18 @@
-import { TagT } from "../types";
+import { FileT, TagT } from "../types";
 
 import fs from 'fs';
 import path from 'path';
-import {createFile, createTagFile, createTag, findTag} from './db';
+import {createFile, createTagFile, createTag, findTag, findAll, findAllByTags, removeFile} from './db';
 
 export async function setFiles(files: string[], tags: string[]) {
     try {
-        console.log('(utils/dropFiles) files: ', files);
-        console.log('(utils/dropFiles) tags: ', tags);
+        // console.log('(utils/dropFiles) files: ', files);
+        // console.log('(utils/dropFiles) tags: ', tags);
 
         const today = new Date();
         const year = today.getFullYear();
         const month = today.getMonth() + 1;
+        //TODO: change __dirname to root directory of application.
         const toPath = path.join(__dirname, 'objects', year.toString(), month.toString());
         const currentDate = today.toISOString();
 
@@ -29,15 +30,16 @@ export async function setFiles(files: string[], tags: string[]) {
     }
 }
 
-async function setFile(filePath: string, tagIds: bigint[], toPath: string, currentDate: string) {
+async function setFile(filePath: string, tagIds: bigint[], targetDir: string, currentDate: string) {
     try {
         const fileName = path.basename(filePath);
-        fs.mkdirSync(toPath, { recursive: true });
-        fs.copyFileSync(filePath, path.join(toPath, fileName));
+        fs.mkdirSync(targetDir, { recursive: true });
+        const toPath = path.join(targetDir, fileName);
+        fs.copyFileSync(filePath, toPath);
 
         const file = {
             name: fileName,
-            path: filePath,
+            path: toPath,
             lastModified: currentDate
         }
         const fileId: bigint = await createFile(file);
@@ -63,6 +65,19 @@ function getTag(tagName: string): Promise<TagT> {
     });
 }
 
-// function getTagsForFile(fileId: bigint): Promise<TagT[]> {
+export async function search(tags: string[]): Promise<FileT[]> {
+    if (!tags || tags.length === 0) {
+        return findAll();
+    } else {
+        return findAllByTags(tags);
+    }
+}
 
-// }
+export async function deleteFile(file: FileT): Promise<void> {
+    try {
+        fs.rmSync(file.path);
+        await removeFile(file.id);
+    } catch (error: any) {
+        console.error('Cannot delete file: ' + error.message);
+    }
+}

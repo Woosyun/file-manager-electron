@@ -3,12 +3,13 @@ import { FileT, TagT } from "./types";
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 contextBridge.exposeInMainWorld('db', {
-    search: (tags: string[]) => ipcRenderer.invoke('search', tags),
     getTagsByFileId: (fileId: bigint) => ipcRenderer.invoke('find-tags-by-file-id', fileId)
 });
 
 contextBridge.exposeInMainWorld('utils', {
+    search: (tags: string[]) => ipcRenderer.invoke('search', tags),
     dropFiles: (files: string[], tags: string[]) => ipcRenderer.send('drop-files', files, tags),
+    deleteFile: (file: FileT) => ipcRenderer.send('delete-file', file),
     getFilePath: (file: File) => webUtils.getPathForFile(file)
 });
 
@@ -16,11 +17,12 @@ export { };
 declare global {
     interface Window {
         db: {
-            search(tags: string[]): Promise<FileT[]>,
             getTagsByFileId(fileId: bigint): Promise<TagT[]>
         };
         utils: {
+            search(tags: string[]): Promise<FileT[]>,
             dropFiles(files: string[], tags: string[]): void,
+            deleteFile(file: FileT): void,
             getFilePath(file: File): string
         }
     }

@@ -48,9 +48,9 @@ async function search() {
     itemContainer.innerHTML = '';
     
     const tagList = Array.from(tags);
-    const result: FileT[] = await window.db.search(tagList);
+    const result: FileT[] = await window.utils.search(tagList);
 
-    console.log('search result: ', JSON.stringify(result, null, 2));
+    // console.log('search result: ', JSON.stringify(result, null, 2));
 
     result.forEach(renderFileItem)
 }
@@ -79,16 +79,27 @@ function getFileItemOptionButton(file: FileT): HTMLButtonElement {
 }
 async function setFileItemOptionPopover(file: FileT) {
     const tags = await window.db.getTagsByFileId(file.id);
+
+    //check whether file exists in folder or not. If not, delete it.
     
     fileItemOptionPopover.innerHTML = `
-        <p>File ID: ${file.id}</p>
         <p>File Name: ${file.name}</p>
         <p>File Path: ${file.path}</p>
         <p>File Last Modified: ${file.lastModified}</p>
         <p>Tags: ${tags.map(tag => tag.name).join(', ')}</p>
     `
+    const button = document.createElement('button');
+    button.innerText = 'Delete';
+    button.addEventListener('click', async () => {
+        deleteFile(file);
+        fileItemOptionPopover.togglePopover();
+        search();
+    });
+    fileItemOptionPopover.appendChild(button);
 }
-
+async function deleteFile(file: FileT) {
+    window.utils.deleteFile(file);
+}
 
 
 const dropzone = document.getElementById('dropzone');
@@ -108,6 +119,8 @@ dropzone?.addEventListener('drop', async (e) => {
         const files = Array.from(e.dataTransfer.files).map(window.utils.getFilePath);
 
         window.utils.dropFiles(files, Array.from(tags));
+
+        search();
     } catch (error: any) {
         alert('Cannot drop file: ' + error.message);
     }

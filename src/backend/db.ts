@@ -19,8 +19,8 @@ export async function init() {
         db.exec(`CREATE TABLE IF NOT EXISTS tag_file (
             tag_id INTEGER,
             file_id INTEGER,
-            FOREIGN KEY(file_id) REFERENCES files(id),
-            FOREIGN KEY(tag_id) REFERENCES tags(id),
+            FOREIGN KEY(file_id) REFERENCES files(id) ON DELETE CASCADE,
+            FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE,
             PRIMARY KEY (tag_id, file_id)
             )`);
         
@@ -29,19 +29,7 @@ export async function init() {
     }
 }
 
-export async function search(tags: string[]): Promise<FileT[]> {
-    try {
-        if (!tags || tags.length === 0) {
-            return searchAll();
-        } else {
-            return searchByTags(tags);
-        }
-    } catch (error: any) {
-        console.error('Cannot search: ' + error.message);
-    }
-}
-
-async function searchByTags(tags: string[]): Promise<FileT[]> {
+export async function findAllByTags(tags: string[]): Promise<FileT[]> {
     // Dynamically create placeholders for the tags
     const placeholders = tags.map(() => '?').join(',');
 
@@ -59,17 +47,17 @@ async function searchByTags(tags: string[]): Promise<FileT[]> {
     // Execute the query with tags, pageSize, and pageNumber * pageSize
     const result = stmt.all([...tags, tags.length]);
 
-    return result.map(getFileT);
+    return result.map(getFileTFromPrimitive);
 }
-async function searchAll(): Promise<FileT[]> {
+export async function findAll(): Promise<FileT[]> {
     const stmt = db.prepare(`
         SELECT f.*
         FROM files f
     `);
     const result = stmt.all();
-    return result.map(getFileT);
+    return result.map(getFileTFromPrimitive);
 }
-function getFileT(prev: {id: bigint, name: string, path: string, last_modified: string}): FileT {
+function getFileTFromPrimitive(prev: {id: bigint, name: string, path: string, last_modified: string}): FileT {
     return {
         ...prev,
         lastModified: new Date(prev.last_modified).toLocaleDateString()
@@ -93,6 +81,19 @@ export async function createFile(file: FileT): Promise<bigint> {
         }
         else
             reject('Cannot create file');
+    });
+}
+export async function removeFile(fileId: bigint): Promise<number> {
+    return new Promise((resolve, reject) => {
+        const stmt = db.prepare(`
+            DELETE FROM files
+            WHERE id = ?
+        `);
+        const info = stmt.run(fileId);
+        if (info.changes)
+            resolve(info.changes);
+        else
+            reject('Cannot delete file');
     });
 }
 export async function createTag(tag: string): Promise<bigint> {
@@ -158,3 +159,16 @@ export async function createTagFile(tagId: bigint, fileId: bigint) {
             reject('Cannot create tag_file');
     });
 }
+// export async function removeTagFileByFileId(fileId: bigint): Promise<number> {
+//     return new Promise((resolve, reject) => {
+//         const stmt = db.prepare(`
+//             DELETE FROM tag_file
+//             WHERE file_id = ?
+//         `);
+//         const info = stmt.run(fileId);
+//         if (info.changes)
+//             resolve(info.changes);
+//         else
+//             reject('Cannot delete tag_file');
+//     });
+// }
