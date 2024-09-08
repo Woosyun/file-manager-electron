@@ -30,20 +30,18 @@ export async function init() {
 }
 
 export async function search(tags: string[]): Promise<FileT[]> {
-    console.log('(db/search)searching for tags: ', tags);
-    
     try {
         if (!tags || tags.length === 0) {
             return searchAll();
         } else {
-            return searchTags(tags);
+            return searchByTags(tags);
         }
     } catch (error: any) {
         console.error('Cannot search: ' + error.message);
     }
 }
 
-async function searchTags(tags: string[]): Promise<FileT[]> {
+async function searchByTags(tags: string[]): Promise<FileT[]> {
     // Dynamically create placeholders for the tags
     const placeholders = tags.map(() => '?').join(',');
 
@@ -67,7 +65,7 @@ async function searchAll(): Promise<FileT[]> {
     const stmt = db.prepare(`
         SELECT f.*
         FROM files f
-        `);
+    `);
     const result = stmt.all();
     return result.map(getFileT);
 }
@@ -128,6 +126,22 @@ export async function findTag(tag: string): Promise<TagT> {
             resolve(result);
         } else {
             reject('Tag not found');
+        }
+    });
+}
+export async function findTagsByFileId(fileId: bigint): Promise<TagT[]> {
+    return new Promise((resolve, reject) => {
+        const stmt = db.prepare(`
+            SELECT t.*
+            FROM tags t
+            JOIN tag_file tf ON t.id = tf.tag_id
+            WHERE tf.file_id = ?
+        `);
+        const result = stmt.all(fileId) as TagT[];
+        if (result) {
+            resolve(result);
+        } else {
+            reject('Tags not found');
         }
     });
 }

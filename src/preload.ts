@@ -1,8 +1,10 @@
-import { FileT } from "./types";
+import { findTagsByFileId } from "./backend/db";
+import { FileT, TagT } from "./types";
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 contextBridge.exposeInMainWorld('db', {
-    search: (tags: string[]) => ipcRenderer.invoke('search', tags)
+    search: (tags: string[]) => ipcRenderer.invoke('search', tags),
+    getTagsByFileId: (fileId: bigint) => ipcRenderer.invoke('find-tags-by-file-id', fileId)
 });
 
 contextBridge.exposeInMainWorld('utils', {
@@ -14,7 +16,8 @@ export { };
 declare global {
     interface Window {
         db: {
-            search(tags: string[]): Promise<FileT[]>
+            search(tags: string[]): Promise<FileT[]>,
+            getTagsByFileId(fileId: bigint): Promise<TagT[]>
         };
         utils: {
             dropFiles(files: string[], tags: string[]): void,

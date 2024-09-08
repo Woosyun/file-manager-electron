@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { init, search } from './backend/db';
+import { findTagsByFileId, init, search } from './backend/db';
 import { setFiles } from './backend/utils';
 
 
@@ -55,4 +55,5 @@ app.on('activate', () => {
 
 init();
 ipcMain.handle('search', (event, tags) => search(tags));
+ipcMain.handle('find-tags-by-file-id', (event, fileId) => findTagsByFileId(fileId));
 ipcMain.on('drop-files', (event, files, tags) => setFiles(files, tags));

@@ -90,3 +90,9 @@ typings/
 
 # Electron-Forge
 out/
+
+
+#etc
+database.*
+database.db-shm
+database.db-wal

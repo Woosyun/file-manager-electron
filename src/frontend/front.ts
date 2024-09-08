@@ -4,16 +4,26 @@ const tagForm = document.querySelector('form');
 const tagInput = tagForm?.querySelector('input');
 export let tags: Set<string> = new Set();
 
+//Searchbar setter
 tagForm?.addEventListener('submit', async function (e: any) {
     e.preventDefault();
 
-    if (!tagInput?.value || tags.has(tagInput?.value)) return;
+    if (!tagInput.value) {
+        search();
+        return;        
+    }
+    
+    if (tags.has(tagInput?.value)) return;
     
     tags.add(tagInput.value);
     updateTagbar();
     search();
+
+    tagInput.value = '';
 });
 
+
+// Tagbar setter
 const tagbar = document.getElementById('tagbar');
 function updateTagbar() {
     if (!tagbar) return;
@@ -31,6 +41,7 @@ function updateTagbar() {
     });
 }
 
+//main container setter
 const itemContainer = document.getElementById('item-container');
 async function search() {
     if (!itemContainer) return;
@@ -41,16 +52,41 @@ async function search() {
 
     console.log('search result: ', JSON.stringify(result, null, 2));
 
-    result.forEach((file: FileT) => {
-        const fileItem = document.createElement('div');
-        fileItem.classList.add('file-item');
-        fileItem.innerHTML = `
+    result.forEach(renderFileItem)
+}
+function renderFileItem(file: FileT) {
+    const fileItem = document.createElement('div');
+    fileItem.classList.add('file-item');
+    fileItem.innerHTML = `
+        <div>
             <div>${file.name}</div>
-            <div>${file.path}</div>
             <div>${file.lastModified}</div>
-        `;
-        itemContainer.appendChild(fileItem);
-    })
+        </div>
+    `;
+    fileItem.appendChild(getFileItemOptionButton(file));
+    itemContainer.appendChild(fileItem);
+}
+const fileItemOptionPopover = document.getElementById('file-item-option-popover') as any;
+function getFileItemOptionButton(file: FileT): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.innerText = 'O';
+    // button.popoverTargetElement = fileItemOptionPopover;
+    button.addEventListener('click', async () => {
+        fileItemOptionPopover.togglePopover();
+        await setFileItemOptionPopover(file);
+    });
+    return button;
+}
+async function setFileItemOptionPopover(file: FileT) {
+    const tags = await window.db.getTagsByFileId(file.id);
+    
+    fileItemOptionPopover.innerHTML = `
+        <p>File ID: ${file.id}</p>
+        <p>File Name: ${file.name}</p>
+        <p>File Path: ${file.path}</p>
+        <p>File Last Modified: ${file.lastModified}</p>
+        <p>Tags: ${tags.map(tag => tag.name).join(', ')}</p>
+    `
 }
 
 

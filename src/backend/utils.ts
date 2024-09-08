@@ -19,7 +19,7 @@ export async function setFiles(files: string[], tags: string[]) {
             const tagId = await getTag(tag);
             return tagId.id!;
         }));
-        console.log('(utils/setFiles) tagIds: ', tagIds);
+        // console.log('(utils/setFiles) tagIds: ', tagIds);
 
         files.forEach(file => {
             setFile(file, tagIds, toPath, currentDate);
@@ -63,10 +63,6 @@ function getTag(tagName: string): Promise<TagT> {
     });
 }
 
-function copyFile(from: string, to: string): void {
-    try {
-        fs.copyFileSync(from, to);
-    } catch (error) {
-        console.error('(utils/copyFile): ' + error);
-    }
-}
+// function getTagsForFile(fileId: bigint): Promise<TagT[]> {
+
+// }

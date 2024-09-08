@@ -37,14 +37,43 @@ hr {
 
 #item-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(20%, auto));
+    grid-template-columns: repeat(auto-fill, minmax(200px, auto));
     min-height: 10vh;
     max-height: 100vh;
     margin-left: var(--aside-width);
 }
+@media (max-width: 600px) {
+    #item-container {
+        grid-template-columns: repeat(auto-fill, minmax(100%, auto));
+    }
+}
+@media (min-width: 610px) and (max-width: 1024px) {
+    #item-container {
+        grid-template-columns: repeat(auto-fill, minmax(50%, auto));
+    }
+}
+@media (min-width: 1025px) {
+    #item-container {
+        grid-template-columns: repeat(auto-fill, minmax(20%, auto));
+    }
+}
+
 .file-item {
+    display: flex;
+    justify-content: space-between;
     border: 1px solid black;
     border-radius: 5px;
     margin: 5px;
     padding: 5px;
+}
+
+#file-item-option-popover {
+    position: absolute;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    width: 20rem;
+    height: 20rem;
+    padding: 5px;
+    z-index: 1;
 }
