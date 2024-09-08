@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { findTagsByFileId, init } from './backend/db';
 import { setFiles, search, deleteFile } from './backend/utils';
 
@@ -58,3 +58,5 @@ ipcMain.handle('search', (event, tags) => search(tags));
 ipcMain.handle('find-tags-by-file-id', (event, fileId) => findTagsByFileId(fileId));
 ipcMain.on('delete-file', (event, file) => deleteFile(file));
 ipcMain.on('drop-files', (event, files, tags) => setFiles(files, tags));
+
+ipcMain.handle('open-path', (event, filePath) => shell.openPath(filePath));

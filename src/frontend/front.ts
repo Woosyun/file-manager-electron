@@ -2,6 +2,7 @@ import { FileT } from "../types";
 
 const tagForm = document.querySelector('form');
 const tagInput = tagForm?.querySelector('input');
+
 export let tags: Set<string> = new Set();
 
 //Searchbar setter
@@ -57,12 +58,21 @@ async function search() {
 function renderFileItem(file: FileT) {
     const fileItem = document.createElement('div');
     fileItem.classList.add('file-item');
-    fileItem.innerHTML = `
-        <div>
-            <div>${file.name}</div>
-            <div>${file.lastModified}</div>
-        </div>
-    `;
+
+    const fileItemContent = document.createElement('div');
+    fileItemContent.classList.add('file-item-content');
+    fileItemContent.innerHTML = `
+        <div>${file.name}</div>
+        <div>${file.lastModified}</div>
+        `;
+    fileItemContent.addEventListener('click', async () => {
+        window.utils.openPath(file.path).then((response: string) => {
+            if (response) {
+                console.log('File opened: ', response);
+            }
+        });
+    });
+    fileItem.appendChild(fileItemContent);
     fileItem.appendChild(getFileItemOptionButton(file));
     itemContainer.appendChild(fileItem);
 }

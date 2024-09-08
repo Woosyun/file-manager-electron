@@ -20,6 +20,9 @@ aside {
 hr {
     margin-left: var(--aside-width);
 }
+button:hover {
+    cursor: pointer;
+}
 
 #tagbar {
     display: flex;
@@ -64,7 +67,16 @@ hr {
     border: 1px solid black;
     border-radius: 5px;
     margin: 5px;
-    padding: 5px;
+}
+.file-item-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.file-item-content:hover {
+    cursor: pointer;
+    background-color: rgba(141, 140, 140, 0.111);
 }
 
 #file-item-option-popover {
