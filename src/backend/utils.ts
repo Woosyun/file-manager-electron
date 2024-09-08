@@ -2,7 +2,7 @@ import { FileT, TagT } from "../types";
 
 import fs from 'fs';
 import path from 'path';
-import { createFile, createTagFile, createTag, findTag, findAll, findAllByTags, removeFile } from './db';
+import { createFile, createTagFile, createTag, findTagId, findAll, findAllByTags, removeFile } from './db';
 import { app } from "electron";
 
 export function getUserDataPath(): string {
@@ -12,7 +12,7 @@ export function getUserDataPath(): string {
 export async function setFiles(files: string[], tags: string[]) {
     try {
         // console.log('(utils/dropFiles) files: ', files);
-        // console.log('(utils/dropFiles) tags: ', tags);
+        console.log('(utils/dropFiles) tags: ', tags);
 
         const today = new Date();
         const year = today.getFullYear();
@@ -24,9 +24,9 @@ export async function setFiles(files: string[], tags: string[]) {
 
         const tagIds = await Promise.all(tags.map(async (tag: string) => {
             const tagId = await getTag(tag);
-            return tagId.id!;
+            return tagId;
         }));
-        // console.log('(utils/setFiles) tagIds: ', tagIds);
+        console.log('(utils/setFiles) tagIds: ', tagIds);
 
         files.forEach(file => {
             setFile(file, tagIds, toPath, currentDate);
@@ -59,9 +59,9 @@ async function setFile(filePath: string, tagIds: bigint[], targetDir: string, cu
     }
 }
 
-function getTag(tagName: string): Promise<TagT> {
+function getTag(tagName: string): Promise<bigint> {
     return new Promise((resolve: any, reject: any) => {
-        findTag(tagName)
+        findTagId(tagName)
             .then(resolve)
             .catch((err: any) => {
                 createTag(tagName)

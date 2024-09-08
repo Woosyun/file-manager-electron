@@ -3,7 +3,7 @@ import { FileT } from "../types";
 const tagForm = document.querySelector('form');
 const tagInput = tagForm?.querySelector('input');
 
-export let tags: Set<string> = new Set();
+const tags: Set<string> = new Set();
 
 //Searchbar setter
 tagForm?.addEventListener('submit', async function (e: any) {
@@ -40,6 +40,8 @@ function updateTagbar() {
         });
         tagbar?.appendChild(tagElement);
     });
+
+    console.log('(updateTagbar)tags: ', Array.from(tags));
 }
 
 //main container setter

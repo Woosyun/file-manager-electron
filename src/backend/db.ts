@@ -112,8 +112,10 @@ export async function createTag(tag: string): Promise<bigint> {
         if (info.lastInsertRowid) {
             if (typeof info.lastInsertRowid === 'number') {
                 const bigintId = BigInt(info.lastInsertRowid);
+                console.log('(createTag) number id: ', bigintId);
                 resolve(bigintId);
             } else {
+                console.log('(createTag) bigint id: ', info.lastInsertRowid);
                 resolve(info.lastInsertRowid);
             }
         }
@@ -121,7 +123,7 @@ export async function createTag(tag: string): Promise<bigint> {
             reject('Cannot create tag');
     });
 }
-export async function findTag(tag: string): Promise<TagT> {
+export async function findTagId(tag: string): Promise<bigint> {
     return new Promise((resolve, reject) => {
         const stmt = db.prepare(`
             SELECT *
@@ -130,7 +132,7 @@ export async function findTag(tag: string): Promise<TagT> {
         `);
         const result = stmt.get(tag) as TagT;
         if (result) {
-            resolve(result);
+            resolve(result!.id);
         } else {
             reject('Tag not found');
         }
