@@ -1,0 +1,50 @@
+:root {
+    --aside-width: 5vw;
+}
+
+input {
+    min-height: 3vh;
+    min-width: 20vw;
+}
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: var(--aside-width);
+}
+aside {
+    position: fixed;
+    height: 100vh;
+    width: calc(var(--aside-width) - 2vw);
+}
+hr {
+    margin-left: var(--aside-width);
+}
+
+#tagbar {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    margin-left: var(--aside-width);
+}
+.tag-item {
+    background-color: rgba(141, 140, 140, 0.111);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+#item-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20%, auto));
+    min-height: 10vh;
+    max-height: 100vh;
+    margin-left: var(--aside-width);
+}
+.file-item {
+    border: 1px solid black;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
