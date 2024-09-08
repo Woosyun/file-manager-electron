@@ -1,6 +1,12 @@
 import { FileT, TagT } from "../types";
 import Database from 'better-sqlite3';
-const db = new Database('database.db');
+import path from 'path';
+import fs from 'fs';
+import { getUserDataPath } from "./utils";
+
+if (!fs.existsSync(path.join(getUserDataPath(), "db")))
+    fs.mkdirSync(path.join(getUserDataPath(), "db"));
+const db = new Database(path.join(getUserDataPath(), "db", "database.db"));
 db.pragma('journal_mode = WAL');
 
 export async function init() {

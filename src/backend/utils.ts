@@ -2,7 +2,12 @@ import { FileT, TagT } from "../types";
 
 import fs from 'fs';
 import path from 'path';
-import {createFile, createTagFile, createTag, findTag, findAll, findAllByTags, removeFile} from './db';
+import { createFile, createTagFile, createTag, findTag, findAll, findAllByTags, removeFile } from './db';
+import { app } from "electron";
+
+export function getUserDataPath(): string {
+    return app.getPath('userData');
+}
 
 export async function setFiles(files: string[], tags: string[]) {
     try {
@@ -13,7 +18,8 @@ export async function setFiles(files: string[], tags: string[]) {
         const year = today.getFullYear();
         const month = today.getMonth() + 1;
         //TODO: change __dirname to root directory of application.
-        const toPath = path.join(__dirname, 'objects', year.toString(), month.toString());
+
+        const toPath = path.join(getUserDataPath(), 'objects', year.toString(), month.toString());
         const currentDate = today.toISOString();
 
         const tagIds = await Promise.all(tags.map(async (tag: string) => {

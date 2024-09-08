@@ -93,6 +93,5 @@ out/
 
 
 #etc
-database.*
-database.db-shm
-database.db-wal
+objects
+db
